@@ -16,8 +16,6 @@ export const loginUser = (credentials) => api.post("/auth/login", credentials);
 // ⚡ registerUser sends name, email, and password
 export const registerUser = (userData) => api.post("/auth/register", userData);
 
-// ⚡ Google Auth Link
-export const GOOGLE_AUTH_URL = import.meta.env.VITE_GOOGLE_AUTH_URL;
 
 // --- THEATER MANAGEMENT ---
 export const getAllTheaters = () => api.get('/theaters');

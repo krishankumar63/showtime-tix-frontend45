@@ -6,7 +6,6 @@ import MovieDetails from "./Pages/MovieDetails.jsx";
 import SeatLayout from "./Pages/SeatSelection.jsx"; // This is your SeatSelection component
 import AdminDashboard from "./Components/AdminDashboard.jsx";
 import AuthModal from "./Pages/AuthModal.jsx";
-import GoogleCallback from "./Components/GoogleCallback";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import MovieSchedule from "./Components/MovieSchedule.jsx";
@@ -49,7 +48,6 @@ const App = () => {
           <Route path="/payment" element={<Payment />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
 
-          {/* <Route path="/oauth2/callback" element={<GoogleCallback />} /> */}
           <Route
             path="/login"
             element={<AuthModal onClose={() => navigate("/")} />}

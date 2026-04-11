@@ -52,7 +52,7 @@ const MovieList = () => {
   if (loading) return (
     <div className="h-96 flex items-center justify-center">
       <h2 className="text-xl font-black text-gray-300 animate-pulse tracking-widest uppercase">
-        Loading Cinema...
+        Waking up the server... first request may take ~30s ☕
       </h2>
     </div>
   );
