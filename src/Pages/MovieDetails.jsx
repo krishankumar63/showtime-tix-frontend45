@@ -27,6 +27,7 @@ const MovieDetails = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0); // ✅ Scroll to top when MovieDetails page loads
     const fetchMovieDetails = async () => {
       if (!id || id === "undefined") return;
       try {
