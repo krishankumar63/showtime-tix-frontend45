@@ -23,10 +23,15 @@ const CheckoutForm = ({ bookingId }) => {
             },
         });
 
-        if (error.type === "card_error" || error.type === "validation_error") {
-            setMessage(error.message);
-        } else {
-            setMessage("An unexpected error occurred.");
+        // ✅ FIX: Guard check before accessing error.type
+        // If payment succeeds, Stripe redirects and error is undefined.
+        // Only runs if redirect fails or payment is declined.
+        if (error) {
+            if (error.type === "card_error" || error.type === "validation_error") {
+                setMessage(error.message);
+            } else {
+                setMessage("An unexpected error occurred.");
+            }
         }
 
         setIsLoading(false);
@@ -35,7 +40,7 @@ const CheckoutForm = ({ bookingId }) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             <PaymentElement />
-            
+
             <button
                 disabled={isLoading || !stripe || !elements}
                 className="w-full bg-[#DC143C] text-white py-5 rounded-2xl font-black uppercase text-xs tracking-[0.2em] shadow-xl shadow-red-200 hover:bg-red-700 transition-all disabled:bg-gray-300"
