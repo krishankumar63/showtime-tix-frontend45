@@ -1,9 +1,13 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { loginUser, registerUser } from "../api"; // Removed GOOGLE_AUTH_URL
+import { useNavigate } from "react-router-dom";
+import { loginUser, registerUser } from "../api";
 import { useAuth } from "../context/AuthContext";
 
-const AuthModal = ({ onClose }) => {
+// ─── Added `onAuthSuccess` prop ───────────────────────────────────────────────
+// When this modal is opened from MovieSchedule (or anywhere else that needs a
+// post-login redirect), the parent passes `onAuthSuccess`.  If it is not passed
+// the modal falls back to the original home-page redirect so nothing else breaks.
+const AuthModal = ({ onClose, onAuthSuccess }) => {
   const { setUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -15,10 +19,25 @@ const AuthModal = ({ onClose }) => {
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  // ─── Shared redirect logic after successful login ─────────────────────────
+  const handlePostLoginRedirect = (cleanedUser) => {
+    if (onAuthSuccess) {
+      // Caller (e.g. MovieSchedule) handles the redirect
+      onAuthSuccess();
+      return;
+    }
+
+    // Original fallback behaviour when modal is opened from other places
+    if (cleanedUser.roles.includes("ROLE_ADMIN")) {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
   };
 
   const handleAuth = async (e) => {
@@ -28,6 +47,7 @@ const AuthModal = ({ onClose }) => {
 
     try {
       if (isLogin) {
+        // ── LOGIN ────────────────────────────────────────────────────────────
         const response = await loginUser({
           usernameOrEmail: credentials.usernameOrEmail,
           password: credentials.password,
@@ -35,8 +55,7 @@ const AuthModal = ({ onClose }) => {
 
         const userData = response.data;
         const rolesArray = userData?.roles || [];
-        
-        // Normalize roles to string array
+
         const cleanedUser = {
           ...userData,
           roles: rolesArray.map((r) =>
@@ -45,38 +64,47 @@ const AuthModal = ({ onClose }) => {
         };
 
         setUser(cleanedUser);
-
-        // Redirect Logic
-        const origin = location.state?.from?.pathname;
-        if (cleanedUser.roles.includes("ROLE_ADMIN")) {
-          navigate("/admin");
-        } else if (origin) {
-          navigate(origin, { replace: true });
-        } else {
-          navigate("/");
-        }
-
         if (onClose) onClose();
+        handlePostLoginRedirect(cleanedUser);
+
       } else {
-        // Registration Payload
+        // ── REGISTER ─────────────────────────────────────────────────────────
         const registrationPayload = {
-          username: credentials.usernameOrEmail, 
-          email: credentials.usernameOrEmail,    
+          username: credentials.usernameOrEmail,
+          email: credentials.usernameOrEmail,
           password: credentials.password,
         };
 
         await registerUser(registrationPayload);
-        
-        // Switch to login mode after successful registration
-        setIsLogin(true);
-        setError(""); 
-        setCredentials({ name: "", usernameOrEmail: "", password: "" });
-        alert("Account created successfully! Please log in.");
+
+        // After signup: auto-login so the user lands on the seat page directly
+        // without having to type their credentials again.
+        const loginResponse = await loginUser({
+          usernameOrEmail: credentials.usernameOrEmail,
+          password: credentials.password,
+        });
+
+        const userData = loginResponse.data;
+        const rolesArray = userData?.roles || [];
+
+        const cleanedUser = {
+          ...userData,
+          roles: rolesArray.map((r) =>
+            typeof r === "string" ? r : r.authority
+          ),
+        };
+
+        setUser(cleanedUser);
+        if (onClose) onClose();
+        handlePostLoginRedirect(cleanedUser);
       }
     } catch (err) {
       console.error("Auth Error:", err);
-      const message = err.response?.data?.message || err.response?.data || "Authentication failed.";
-      setError(typeof message === 'string' ? message : "Invalid input data.");
+      const message =
+        err.response?.data?.message ||
+        err.response?.data ||
+        "Authentication failed.";
+      setError(typeof message === "string" ? message : "Invalid input data.");
     } finally {
       setLoading(false);
     }
@@ -85,7 +113,7 @@ const AuthModal = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4 md:p-6">
       <div className="bg-white w-full max-w-[450px] max-h-[95vh] overflow-y-auto rounded-2xl shadow-2xl relative flex flex-col no-scrollbar">
-        
+
         {/* Close Button */}
         <button
           onClick={onClose}

@@ -2,16 +2,19 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getFilteredShows, getAllTheaters } from '../api';
 import { FaMapMarkerAlt, FaCalendarAlt, FaChevronRight } from 'react-icons/fa';
+import { useAuth } from '../context/AuthContext';
+import AuthModal from '../Pages/AuthModal';
 
 const MovieSchedule = () => {
     const { movieId } = useParams();
     const navigate = useNavigate();
-    
+    const { user, loading: authLoading } = useAuth();
+
     const [shows, setShows] = useState([]);
     const [availableCities, setAvailableCities] = useState(['All']);
-    const [isListLoading, setIsListLoading] = useState(true); 
-    
-    // ⚡ FIX 1: Set initial date explicitly to the 20th
+    const [isListLoading, setIsListLoading] = useState(true);
+    const [showAuthModal, setShowAuthModal] = useState(false);
+
     const [selectedDate, setSelectedDate] = useState('2026-01-20');
     const [selectedCity, setSelectedCity] = useState('All');
 
@@ -46,18 +49,13 @@ const MovieSchedule = () => {
         fetchFilteredShows();
     }, [movieId, selectedDate, selectedCity]);
 
-    // ⚡ FIX 2: Corrected Date Generation Logic
     const dateOptions = useMemo(() => {
         return [...Array(7)].map((_, i) => {
-            // We create the date for each day
-            const d = new Date(2026, 0, 20 + i); 
-            
-            // Format to YYYY-MM-DD manually to avoid ISO Timezone shifts
+            const d = new Date(2026, 0, 20 + i);
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
             const dateString = `${year}-${month}-${day}`;
-
             return {
                 full: dateString,
                 day: d.toLocaleDateString('en-US', { weekday: 'short' }),
@@ -80,8 +78,43 @@ const MovieSchedule = () => {
         }, {});
     }, [shows]);
 
+    // ─── Show Click Handler ───────────────────────────────────────────────────
+    const handleShowClick = (showId) => {
+        const intendedPath = `/select-seats/${showId}`;
+
+        if (!user) {
+            // Save where user wanted to go, then open login modal
+            sessionStorage.setItem('redirectAfterLogin', intendedPath);
+            setShowAuthModal(true);
+        } else {
+            navigate(intendedPath);
+        }
+    };
+
+    // ─── After login completes inside the modal ───────────────────────────────
+    const handleAuthSuccess = () => {
+        setShowAuthModal(false);
+        const redirectTo = sessionStorage.getItem('redirectAfterLogin');
+        sessionStorage.removeItem('redirectAfterLogin');
+        if (redirectTo) {
+            navigate(redirectTo);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 pb-20">
+
+            {/* AUTH MODAL */}
+            {showAuthModal && (
+                <AuthModal
+                    onClose={() => {
+                        setShowAuthModal(false);
+                        sessionStorage.removeItem('redirectAfterLogin');
+                    }}
+                    onAuthSuccess={handleAuthSuccess}
+                />
+            )}
+
             {/* STICKY HEADER */}
             <div className="bg-white border-b sticky top-0 z-30 px-4 py-4 md:py-6 shadow-sm">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 items-center justify-between">
@@ -101,7 +134,7 @@ const MovieSchedule = () => {
 
                     <div className="flex items-center gap-3 bg-gray-50 px-5 py-3 rounded-2xl border border-gray-100 w-full md:w-auto">
                         <FaMapMarkerAlt className="text-[#DC143C]" />
-                        <select 
+                        <select
                             value={selectedCity}
                             onChange={(e) => setSelectedCity(e.target.value)}
                             className="bg-transparent font-black uppercase text-xs outline-none cursor-pointer text-gray-700 w-full md:min-w-[120px]"
@@ -116,8 +149,8 @@ const MovieSchedule = () => {
             <div className="max-w-5xl mx-auto mt-6 md:mt-12 px-4">
                 {isListLoading ? (
                     <div className="text-center py-20">
-                         <div className="w-10 h-10 border-4 border-[#DC143C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Refreshing Shows...</p>
+                        <div className="w-10 h-10 border-4 border-[#DC143C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Refreshing Shows...</p>
                     </div>
                 ) : Object.keys(groupedShows).length > 0 ? (
                     Object.values(groupedShows).map((theater) => (
@@ -130,19 +163,17 @@ const MovieSchedule = () => {
                                         <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-wider">{theater.address}</p>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex flex-wrap gap-3 md:gap-4">
                                     {theater.shows.map((show) => (
                                         <button
                                             key={show.id}
-                                            onClick={() => navigate(`/select-seats/${show.id}`)}
+                                            onClick={() => handleShowClick(show.id)}
                                             className="group relative flex flex-col items-center justify-center min-w-[100px] md:min-w-[120px] border-2 border-gray-100 hover:border-[#DC143C] px-4 py-3 md:py-4 rounded-2xl transition-all duration-300 bg-white ring-offset-2 hover:ring-2 hover:ring-red-100"
                                         >
                                             <div className="text-sm md:text-base font-black text-gray-800 group-hover:text-[#DC143C] transition-colors">
-                                                {/* Format time correctly */}
                                                 {new Date(show.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </div>
-                                            
                                             <div className="flex items-center gap-1 text-[8px] md:text-[9px] font-black text-gray-400 uppercase mt-1 group-hover:text-[#DC143C]">
                                                 <span>{show.screenName}</span>
                                                 <FaChevronRight className="hidden group-hover:block transition-all" />

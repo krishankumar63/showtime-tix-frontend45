@@ -3,7 +3,7 @@ import Home from "./Pages/Home.jsx";
 import Footer from "./Components/Footer.jsx";
 import { Route, Routes } from "react-router-dom";
 import MovieDetails from "./Pages/MovieDetails.jsx";
-import SeatLayout from "./Pages/SeatSelection.jsx"; // This is your SeatSelection component
+import SeatLayout from "./Pages/SeatSelection.jsx";
 import AdminDashboard from "./Components/AdminDashboard.jsx";
 import AuthModal from "./Pages/AuthModal.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute";
@@ -16,9 +16,10 @@ import { useNavigate } from "react-router-dom";
 
 const App = () => {
   const navigate = useNavigate();
+
   return (
-    <div>
-      <AuthProvider>
+    <AuthProvider>
+      <div>
         <Navbar />
 
         <Routes>
@@ -26,15 +27,20 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/movie/:id" element={<MovieDetails />} />
           <Route path="/book/:movieId" element={<MovieSchedule />} />
-          {/* ⚡ UPDATED: Added :showId parameter to match your SeatSelection logic */}
-          <Route
-            path="/select-seats/:showId"
-            element={
-              <ProtectedRoute>
-                <SeatLayout />
-              </ProtectedRoute>
-            }
-          />
+
+          {/*
+            ✅ No ProtectedRoute here.
+            MovieSchedule already blocks unauthenticated users with the modal.
+            Keeping ProtectedRoute here would redirect them to /login and
+            destroy the sessionStorage redirect intent we saved.
+          */}
+          <Route path="/select-seats/:showId" element={<SeatLayout />} />
+
+          {/* Payment Routes */}
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+
+          {/* Protected Routes */}
           <Route
             path="/mybookings"
             element={
@@ -44,16 +50,12 @@ const App = () => {
             }
           />
 
-          {/* ⚡ NEW: Payment Routes */}
-          <Route path="/payment" element={<Payment />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-
           <Route
             path="/login"
             element={<AuthModal onClose={() => navigate("/")} />}
           />
 
-          {/* ⚡ SECURE ADMIN ROUTE */}
+          {/* Admin Route */}
           <Route
             path="/admin/*"
             element={
@@ -63,10 +65,10 @@ const App = () => {
             }
           />
         </Routes>
-      </AuthProvider>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </AuthProvider>
   );
 };
 
