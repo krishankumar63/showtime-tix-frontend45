@@ -4,6 +4,7 @@ import { Film, Search, Menu, Ticket, Star, X, User } from "lucide-react";
 import AuthModal from "../Pages/AuthModal";
 import { useAuth } from "../context/AuthContext";
 import { searchMovies } from "../api"; 
+import voucherLogo from '../assets/voucher.png';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -61,11 +62,16 @@ const Navbar = () => {
           
           {/* Logo */}
            <Link to="/" className="flex items-center gap-2 shrink-0">
-            <Film size={28} className="text-[#DC143C]" />
-            <span className="font-black text-xl md:text-2xl text-gray-900 tracking-tighter uppercase">
-              SHOWTIME TIX
-            </span>
-          </Link>
+  <img 
+    src={voucherLogo} 
+    alt="ShowTime Tix Logo" 
+    className="w-11 h-11 object-contain"
+  />
+  <span className="font-black text-2xl md:text-3xl tracking-tighter">
+    <span className="text-gray-900">Showtime </span>
+    <span className="text-[#DC143C]">Tix</span>
+  </span>
+</Link>
 
           {/* Desktop Search */}
           <div className="hidden md:block flex-1 max-w-md mx-8 relative" ref={dropdownRef}>
@@ -115,29 +121,59 @@ const Navbar = () => {
           </div>
 
           {/* Right Section (Desktop) */}
-          <div className="hidden lg:flex items-center gap-6">
-            {!loading && user && user.email !== "anonymousUser" ? (
-              <>
-                <Link to="/mybookings" className="flex items-center gap-2 text-xs font-black text-gray-500 hover:text-[#DC143C] transition-all uppercase tracking-widest">
-                  <Ticket size={18} />
-                  My Bookings
-                </Link>
-                <div className="h-8 w-px bg-gray-200" />
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-xs font-black text-gray-900">{user.name || ' Hi Member!'}</p>
-                  </div>
-                  <button onClick={logout} className="text-xs font-black border-2 border-gray-900 px-4 py-2 rounded-lg hover:bg-gray-900 hover:text-white transition-all uppercase">
-                    LOGOUT
-                  </button>
-                </div>
-              </>
-            ) : (
-              <button onClick={() => setIsAuthOpen(true)} className="bg-[#DC143C] text-white text-xs font-black px-6 py-3 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100 uppercase tracking-widest">
-                SIGN IN
-              </button>
-            )}
-          </div>
+          {/* Desktop Right */}
+<div className="hidden lg:flex items-center gap-6">
+  {!loading && user && user.email !== "anonymousUser" ? (
+    <>
+      <Link
+        to="/mybookings"
+        className="flex items-center gap-2 text-xs font-black text-gray-500 hover:text-[#DC143C] transition-all uppercase tracking-widest"
+      >
+        <Ticket size={18} />
+        My Bookings
+      </Link>
+
+      <div className="h-8 w-px bg-gray-200" />
+
+      <div className="flex items-center gap-3">
+        {/* Avatar circle */}
+        <div className="w-9 h-9 rounded-full bg-red-50 border-2 border-[#DC143C] flex items-center justify-center shrink-0">
+          {user.name ? (
+            <span className="text-[#DC143C] text-sm font-black uppercase">
+              {user.name.charAt(0)}
+            </span>
+          ) : (
+            <User size={16} className="text-[#DC143C]" />
+          )}
+        </div>
+
+        {/* Name + label */}
+        <div className="leading-tight">
+          <p className="text-[10px] text-gray-400 uppercase tracking-wide">Logged in as</p>
+          <p className="text-xs font-black text-gray-900 truncate max-w-[90px]">
+            {user.name || 'Member'}
+          </p>
+        </div>
+
+        {/* Logout button */}
+        <button
+          onClick={logout}
+          className="flex items-center gap-1.5 text-xs font-black border-2 border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all uppercase"
+        >
+          <LogOut size={13} />
+          Logout
+        </button>
+      </div>
+    </>
+  ) : (
+    <button
+      onClick={() => setIsAuthOpen(true)}
+      className="bg-[#DC143C] text-white text-xs font-black px-6 py-3 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100 uppercase tracking-widest"
+    >
+      SIGN IN
+    </button>
+  )}
+</div>
 
           {/* Mobile Menu Toggle */}
           <div className="lg:hidden flex items-center gap-4">
