@@ -135,29 +135,26 @@ const Navbar = () => {
 
       <div className="h-8 w-px bg-gray-200" />
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-5">
 
-        {/* User info — no border, no bg */}
-        <div className="flex items-center gap-2 px-1 py-1">
-          <User size={16} className="text-[#DC143C] shrink-0" />
-          <div className="leading-tight">
-            <p className="text-[9px] text-gray-400 uppercase tracking-wide">Logged in as</p>
-            <p className="text-sm font-black text-gray-900 truncate max-w-[110px]">
-              {user.name || 'Member'}
-            </p>
-          </div>
-        </div>
+  {/* User info — no icon, no border */}
+  <div className="leading-tight">
+    <p className="text-[9px] text-gray-400 uppercase tracking-wide">Logged in as</p>
+    <p className="text-sm font-black text-gray-900 truncate max-w-[110px]">
+      {user.name || 'Member'}
+    </p>
+  </div>
 
-        {/* Logout */}
-        <button
-          onClick={logout}
-          className="flex items-center gap-1.5 text-xs font-black border-2 border-gray-200 px-4 py-2 rounded-xl hover:bg-[#DC143C] hover:text-white hover:border-[#DC143C] transition-all uppercase"
-        >
-          <LogOut size={13} />
-          Logout
-        </button>
+  {/* Logout */}
+  <button
+    onClick={logout}
+    className="flex items-center gap-1.5 text-xs font-black border-2 border-gray-200 px-4 py-2 rounded-xl hover:bg-[#DC143C] hover:text-white hover:border-[#DC143C] transition-all uppercase"
+  >
+    <LogOut size={13} />
+    Logout
+  </button>
 
-      </div>
+</div>
     </>
   ) : (
     <button
