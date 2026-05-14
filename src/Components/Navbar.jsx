@@ -158,11 +158,11 @@ const Navbar = () => {
     </>
   ) : (
     <button
-      onClick={() => setIsAuthOpen(true)}
-      className="bg-[#DC143C] text-white text-xs font-black px-6 py-3 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100 tracking-widest"
-    >
-      Sign in
-    </button>
+  onClick={() => setIsAuthOpen(true)}
+  className="bg-[#DC143C] text-white text-sm font-bold px-8 py-3 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100 tracking-wide uppercase"
+>
+  Sign In
+</button>
   )}
 </div>
 
