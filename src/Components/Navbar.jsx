@@ -125,45 +125,44 @@ const Navbar = () => {
 <div className="hidden lg:flex items-center gap-6">
   {!loading && user && user.email !== "anonymousUser" ? (
     <>
-
-<Link
-  to="/mybookings"
-  className="flex items-center gap-2 text-xs font-black border-2 border-gray-200 px-4 py-2 rounded-xl text-gray-600 hover:border-[#DC143C] hover:text-[#DC143C] transition-all uppercase tracking-widest"
->
-  <Ticket size={16} className="text-[#DC143C]" />
-  My Bookings
-</Link>
+      <Link
+        to="/mybookings"
+        className="flex items-center gap-2 text-xs font-black text-gray-500 hover:text-[#DC143C] transition-all uppercase tracking-widest"
+      >
+        <Ticket size={18} className="text-[#DC143C]" />
+        My Bookings
+      </Link>
 
       <div className="h-8 w-px bg-gray-200" />
 
-<div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
 
-  {/* User pill */}
-  <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 px-3 py-2 rounded-xl">
-    <User size={14} className="text-[#DC143C] shrink-0" />
-    <div className="leading-tight">
-      <p className="text-[9px] text-gray-400 uppercase tracking-wide">Logged in as</p>
-      <p className="text-xs font-black text-gray-900 truncate max-w-[90px]">
-        {user.name || 'Member'}
-      </p>
-    </div>
-  </div>
+        {/* User info — no border, no bg */}
+        <div className="flex items-center gap-2 px-1 py-1">
+          <User size={16} className="text-[#DC143C] shrink-0" />
+          <div className="leading-tight">
+            <p className="text-[9px] text-gray-400 uppercase tracking-wide">Logged in as</p>
+            <p className="text-sm font-black text-gray-900 truncate max-w-[110px]">
+              {user.name || 'Member'}
+            </p>
+          </div>
+        </div>
 
-  {/* Logout button */}
-  <button
-    onClick={logout}
-    className="flex items-center gap-1.5 text-xs font-black border-2 border-gray-200 px-4 py-2 rounded-xl hover:bg-red-600 hover:text-white hover:border-red-600 transition-all uppercase"
-  >
-    <LogOut size={13} />
-    Logout
-  </button>
+        {/* Logout */}
+        <button
+          onClick={logout}
+          className="flex items-center gap-1.5 text-xs font-black border-2 border-gray-200 px-4 py-2 rounded-xl hover:bg-[#DC143C] hover:text-white hover:border-[#DC143C] transition-all uppercase"
+        >
+          <LogOut size={13} />
+          Logout
+        </button>
 
-</div>
+      </div>
     </>
   ) : (
     <button
       onClick={() => setIsAuthOpen(true)}
-      className="bg-[#DC143C] text-white text-xs font-black px-6 py-3 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100 uppercase tracking-widest"
+      className="bg-[#DC143C] text-white text-xs font-black px-6 py-3 rounded-xl hover:bg-red-700 transition-all shadow-lg shadow-red-100 tracking-widest"
     >
       Sign in
     </button>
