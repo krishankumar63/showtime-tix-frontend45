@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Film, Search, Menu, Ticket, Star, X, User } from "lucide-react"; 
+import { Search, Menu, Ticket, Star, X, User, LogOut } from "lucide-react";
 import AuthModal from "../Pages/AuthModal";
 import { useAuth } from "../context/AuthContext";
 import { searchMovies } from "../api"; 
